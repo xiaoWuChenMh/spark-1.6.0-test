@@ -1,18 +1,19 @@
 package com.risker.Akka.fourth
 
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
 
 /**
-  * 通过context.stop方法停止指定Actor的运行
-  * Created by hc-3450 on 2017/4/13.
+  * 通过akka.actor.PoisonPill消息停止指定Actor的运行
+  * Created by hc-3450 on 2017/4/14.
   */
-object Example_07 {
+object Example_08 {
 
   class FirstActor extends Actor with ActorLogging{
 
     var child:ActorRef = context.actorOf(Props[MyActor], name = "myActor")
     def receive = {
-      case "stop"=> Thread.sleep(5000);context.stop(child)//关闭child对应的Actor
+      //向child发送PoisonPill停止其运行
+      case "stop"=>Thread.sleep(500);child!PoisonPill
       case x =>{
         //向MyActor发送消息
         child ! x
@@ -46,5 +47,4 @@ object Example_07 {
     firstactor! 123
     firstactor!"stop"
   }
-
 }
